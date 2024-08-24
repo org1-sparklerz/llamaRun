@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 
 
 def validate_version() -> None:
-    logger.info(f"Running {TextStyle.BOLD}Petals {llamaRun.__version__}{TextStyle.RESET}")
+    logger.info(f"Running {TextStyle.BOLD}llamaRun {llamaRun.__version__}{TextStyle.RESET}")
     try:
         r = requests.get("https://pypi.python.org/pypi/petals/json")
         r.raise_for_status()
