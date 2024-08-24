@@ -17,10 +17,10 @@ from safetensors import safe_open
 from safetensors.torch import load_file
 from transformers.utils import get_file_from_repo
 
-from petals.server.block_utils import get_model_block, resolve_block_dtype
-from petals.utils.convert_block import QuantType
-from petals.utils.disk_cache import allow_cache_reads, allow_cache_writes, free_disk_space_for
-from petals.utils.misc import get_size_in_bytes
+from llamaRun.server.block_utils import get_model_block, resolve_block_dtype
+from llamaRun.utils.convert_block import QuantType
+from llamaRun.utils.disk_cache import allow_cache_reads, allow_cache_writes, free_disk_space_for
+from llamaRun.utils.misc import get_size_in_bytes
 
 logger = get_logger(__name__)
 
@@ -80,7 +80,7 @@ def load_peft(
     max_disk_space: Optional[int] = None,
     delay: float = 30,
 ):
-    # TODO: Check is it possible to add safetensors loading inside petals/server/from_pretrained.py and reuse it here
+    # TODO: Check is it possible to add safetensors loading inside llamaRun/server/from_pretrained.py and reuse it here
 
     if not check_peft_repository(repo_id):
         raise ValueError(f"Repo: {repo_id} doesn't have safetensors inside for a safe loading.")

@@ -21,24 +21,24 @@ from hivemind.proto.runtime_pb2 import CompressionType
 from hivemind.utils.logging import get_logger
 from transformers import PretrainedConfig
 
-import petals
-from petals.constants import DTYPE_MAP, PUBLIC_INITIAL_PEERS
-from petals.data_structures import CHAIN_DELIMITER, UID_DELIMITER, ModelInfo, ServerInfo, ServerState, parse_uid
-from petals.server import block_selection
-from petals.server.backend import TransformerBackend, merge_inference_pools_inplace
-from petals.server.block_utils import get_block_size, resolve_block_dtype
-from petals.server.from_pretrained import load_pretrained_block
-from petals.server.handler import TransformerConnectionHandler
-from petals.server.memory_cache import MemoryCache
-from petals.server.reachability import ReachabilityProtocol, check_direct_reachability, validate_reachability
-from petals.server.throughput import get_dtype_name, get_server_throughput
-from petals.utils.auto_config import AutoDistributedConfig
-from petals.utils.convert_block import QuantType, check_device_balance, convert_block
-from petals.utils.dht import declare_active_modules, get_remote_module_infos
-from petals.utils.misc import get_size_in_bytes
-from petals.utils.ping import PingAggregator
-from petals.utils.random import sample_up_to
-from petals.utils.version import get_compatible_model_repo
+import llamaRun
+from llamaRun.constants import DTYPE_MAP, PUBLIC_INITIAL_PEERS
+from llamaRun.data_structures import CHAIN_DELIMITER, UID_DELIMITER, ModelInfo, ServerInfo, ServerState, parse_uid
+from llamaRun.server import block_selection
+from llamaRun.server.backend import TransformerBackend, merge_inference_pools_inplace
+from llamaRun.server.block_utils import get_block_size, resolve_block_dtype
+from llamaRun.server.from_pretrained import load_pretrained_block
+from llamaRun.server.handler import TransformerConnectionHandler
+from llamaRun.server.memory_cache import MemoryCache
+from llamaRun.server.reachability import ReachabilityProtocol, check_direct_reachability, validate_reachability
+from llamaRun.server.throughput import get_dtype_name, get_server_throughput
+from llamaRun.utils.auto_config import AutoDistributedConfig
+from llamaRun.utils.convert_block import QuantType, check_device_balance, convert_block
+from llamaRun.utils.dht import declare_active_modules, get_remote_module_infos
+from llamaRun.utils.misc import get_size_in_bytes
+from llamaRun.utils.ping import PingAggregator
+from llamaRun.utils.random import sample_up_to
+from llamaRun.utils.version import get_compatible_model_repo
 
 logger = get_logger(__name__)
 
@@ -303,8 +303,8 @@ class Server:
         block_size = get_block_size(self.block_config, "memory", dtype=self.torch_dtype, quant_type=self.quant_type)
         total_memory_per_block = block_size + self._cache_bytes_per_block
         if self.adapters:
-            # Delay import of petals.utils.peft to avoid unnecessary import of bitsandbytes
-            from petals.utils.peft import estimate_adapter_memory_per_block
+            # Delay import of llamaRun.utils.peft to avoid unnecessary import of bitsandbytes
+            from llamaRun.utils.peft import estimate_adapter_memory_per_block
 
             total_memory_per_block += estimate_adapter_memory_per_block(
                 self.block_config,
@@ -737,7 +737,7 @@ class ModuleAnnouncerThread(threading.Thread):
                 break
             if not self.dht_prefix.startswith("_"):  # Not private
                 self.dht.store(
-                    key="_petals.models",
+                    key="_llamaRun.models",
                     subkey=self.dht_prefix,
                     value=self.model_info.to_dict(),
                     expiration_time=get_dht_time() + self.expiration,

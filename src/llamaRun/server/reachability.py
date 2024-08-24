@@ -14,7 +14,7 @@ from hivemind.p2p import P2P, P2PContext, PeerID, ServicerBase
 from hivemind.proto import dht_pb2
 from hivemind.utils import get_logger
 
-from petals.constants import REACHABILITY_API_URL
+from llamaRun.constants import REACHABILITY_API_URL
 
 logger = get_logger(__name__)
 
@@ -47,7 +47,7 @@ def validate_reachability(peer_id, wait_time: float = 7 * 60, retry_delay: float
         f"    1. Choose a specific port for the Petals server, for example, 31337.\n"
         f"    2. Ensure that this port is accessible from the Internet and not blocked by your firewall.\n"
         f"    3. Add these arguments to explicitly announce your IP address and port to other peers:\n"
-        f"        python -m petals.cli.run_server ... --public_ip {response['your_ip']} --port 31337\n"
+        f"        python -m llamaRun.cli.run_server ... --public_ip {response['your_ip']} --port 31337\n"
         f"    4. If it does not help, ask for help in our Discord: https://discord.gg/Wuk8BnrEPH\n"
     )
 

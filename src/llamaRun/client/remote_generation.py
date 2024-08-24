@@ -116,7 +116,7 @@ class RemoteGenerationMixin(_SkipTokensMixin):
             if n_prev_tokens > 0:
                 if kwargs.get("num_beams", 1) > 1:
                     logger.warning(
-                        "Beam search will not work properly in the resumed petals.InferenceSession "
+                        "Beam search will not work properly in the resumed llamaRun.InferenceSession "
                         "since intermediate beam entries are lost"
                     )
 
