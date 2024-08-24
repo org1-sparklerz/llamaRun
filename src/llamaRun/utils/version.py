@@ -6,7 +6,7 @@ import requests
 from hivemind.utils.logging import TextStyle, get_logger
 from packaging.version import parse
 
-import llamaRun
+import petals
 
 logger = get_logger(__name__)
 

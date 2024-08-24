@@ -21,7 +21,7 @@ from hivemind.proto.runtime_pb2 import CompressionType
 from hivemind.utils.logging import get_logger
 from transformers import PretrainedConfig
 
-import llamaRun
+import petals
 from llamaRun.constants import DTYPE_MAP, PUBLIC_INITIAL_PEERS
 from llamaRun.data_structures import CHAIN_DELIMITER, UID_DELIMITER, ModelInfo, ServerInfo, ServerState, parse_uid
 from llamaRun.server import block_selection
@@ -737,7 +737,7 @@ class ModuleAnnouncerThread(threading.Thread):
                 break
             if not self.dht_prefix.startswith("_"):  # Not private
                 self.dht.store(
-                    key="_llamaRun.models",
+                    key="_petals.models",
                     subkey=self.dht_prefix,
                     value=self.model_info.to_dict(),
                     expiration_time=get_dht_time() + self.expiration,
