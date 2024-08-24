@@ -21,7 +21,7 @@ from hivemind.proto.runtime_pb2 import CompressionType
 from hivemind.utils.logging import get_logger
 from transformers import PretrainedConfig
 
-import petals
+import llamaRun
 from llamaRun.constants import DTYPE_MAP, PUBLIC_INITIAL_PEERS
 from llamaRun.data_structures import CHAIN_DELIMITER, UID_DELIMITER, ModelInfo, ServerInfo, ServerState, parse_uid
 from llamaRun.server import block_selection
@@ -254,7 +254,7 @@ class Server:
         self.server_info = ServerInfo(
             state=ServerState.JOINING,
             public_name=public_name,
-            version=petals.__version__,
+            version=llamaRun.__version__,
             adapters=tuple(adapters),
             torch_dtype=str(torch_dtype).replace("torch.", ""),
             quant_type=quant_type.name.lower(),
