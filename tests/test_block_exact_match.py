@@ -3,9 +3,9 @@ import random
 import pytest
 import torch
 
-from petals import AutoDistributedConfig, RemoteSequential
-from petals.server.block_functions import MAX_SHORT_INFERENCE_TOKENS
-from petals.server.from_pretrained import load_pretrained_block
+from llamaRun import AutoDistributedConfig, RemoteSequential
+from llamaRun.server.block_functions import MAX_SHORT_INFERENCE_TOKENS
+from llamaRun.server.from_pretrained import load_pretrained_block
 from test_utils import *
 
 
