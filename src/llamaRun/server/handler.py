@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import multiprocessing as mp
 import sys
+import os
 from enum import Enum
 from itertools import chain
 from typing import Any, AsyncIterator, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -380,33 +381,44 @@ class TransformerConnectionHandler(ConnectionHandler):
     async def rpc_forward_stream(
         self, requests: AsyncIterator[runtime_pb2.ExpertRequest], context: P2PContext
     ) -> AsyncIterator[runtime_pb2.ExpertRequest]:
-        async with timeout(self.request_timeout):
-            # Parse requests and prepare backends
-            uid_str, flat_inputs, metadata = await self._gather_inputs(requests, context)
-            requested_uids = self._check_uids(uid_str)
-            self._log_request("rpc_forward_stream", requested_uids, context)
 
-            requested_backends = tuple(self.module_backends[uid] for uid in requested_uids)
-            active_adapter = self._get_active_adapter(metadata)
-            points = metadata.get("points", 0)
-            args_structure = metadata.get("args_structure")
-            assert isinstance(
-                points, (float, int)
-            ), f"rpc_forward_stream should have number of points as number or None, got {points}"
+        while True:
+            try:
+                async with timeout(self.request_timeout):
+                    # Parse requests and prepare backends
+                    uid_str, flat_inputs, metadata = await self._gather_inputs(requests, context)
+                    requested_uids = self._check_uids(uid_str)
+                    self._log_request("rpc_forward_stream", requested_uids, context)
 
-            hidden_states = await run_rpc_forward(
-                *flat_inputs,
-                requested_backends=requested_backends,
-                prioritizer=self._prioritizer,
-                active_adapter=active_adapter,
-                points=points,
-                args_structure=args_structure,
-            )
+                    requested_backends = tuple(self.module_backends[uid] for uid in requested_uids)
+                    active_adapter = self._get_active_adapter(metadata)
+                    points = metadata.get("points", 0)
+                    args_structure = metadata.get("args_structure")
+                    assert isinstance(
+                        points, (float, int)
+                    ), f"rpc_forward_stream should have number of points as number or None, got {points}"
 
-            # Split the serialized_output for streaming and respond to client
-            for tensor in self._serialize_outputs(hidden_states, requested_backends, metadata):
-                for part in split_for_streaming(tensor, DEFAULT_MAX_MSG_SIZE):
-                    yield runtime_pb2.ExpertResponse(tensors=[part])
+                    hidden_states = await run_rpc_forward(
+                        *flat_inputs,
+                        requested_backends=requested_backends,
+                        prioritizer=self._prioritizer,
+                        active_adapter=active_adapter,
+                        points=points,
+                        args_structure=args_structure,
+                    )
+
+                    # Split the serialized_output for streaming and respond to client
+                    for tensor in self._serialize_outputs(hidden_states, requested_backends, metadata):
+                        for part in split_for_streaming(tensor, DEFAULT_MAX_MSG_SIZE):
+                            yield runtime_pb2.ExpertResponse(tensors=[part])
+                break
+            except asyncio.exceptions.CancelledError:
+                if "KAGGLE_KERNEL_RUN_TYPE" in os.environ:
+                    print("CancelledError occurred on Kaggle. Restarting the cell...")
+                    os.system('python -c "from kaggle import api as kaggle_api; kaggle_api.kernel_output(0)"')
+                else:
+                    print("CancelledError occurred, but not running on Kaggle. Exiting...")
+                    raise
 
     def _serialize_outputs(
         self,
